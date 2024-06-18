@@ -13,9 +13,11 @@ class KategoriController extends Controller
      */
     public function index()
     {
+        // Mengambil semua data kategori dari database
         $kategori = Kategori::all();
         $data = array("data"=>$kategori);
 
+        // Mengembalikan response JSON dengan data kategori
         return response()->json($data);
     }
 
@@ -24,19 +26,22 @@ class KategoriController extends Controller
      */
     public function store(Request $request)
     {
+        // Validasi data dari request jika diperlukan
         $request->validate([
             'deskripsi'   => 'required',
             'kategori'    => 'required',
         ]);
         
+        // Menyimpan data kategori baru ke database
         $kategoribaru = Kategori::create([
             'deskripsi'  => $request->deskripsi,
             'kategori'   => $request->kategori,
         ]);
 
         $data = array("data"=>$kategoribaru);
-        return response()->json($data);
 
+        // Mengembalikan response JSON dengan data kategori yang baru dibuat
+        return response()->json($data);
     }
 
     /**
@@ -44,12 +49,15 @@ class KategoriController extends Controller
      */
     public function show(string $id)
     {   
+        // Mengambil data kategori berdasarkan ID
         $kategori = Kategori::find($id);
         
         if(!$kategori){
+            // Mengembalikan response JSON dengan pesan error jika kategori tidak ditemukan
             return response()->json(['message' => 'Kategori tidak ditemukan'], 404);
         }else{
             $data=array("data"=>$kategori);
+            // Mengembalikan response JSON dengan data kategori
             return response()->json($data);
         }
     }
@@ -59,22 +67,27 @@ class KategoriController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        // Mengambil data kategori berdasarkan ID
         $kategori = Kategori::find($id);
 
+        // Validasi data dari request jika diperlukan
         $request->validate([
             'deskripsi'   => 'required',
             'kategori'    => 'required',
         ]);
         
         if (!$kategori) {
+            // Mengembalikan response JSON dengan pesan error jika kategori tidak ditemukan
             return response()->json(['status' => 'Kategori tidak ditemukan'], 404);
         }else{
+            // Memperbarui data kategori dengan input baru
             $kategori->update([
-                'deskripsi'=>$request->deskripsi,
-                'kategori'=>$request->kategori,
+                'deskripsi' => $request->deskripsi,
+                'kategori' => $request->kategori,
             ]);
 
-        return response()->json(['status' => 'Kategori berhasil diubah'], 200);          
+            // Mengembalikan response JSON dengan pesan sukses jika kategori berhasil diubah
+            return response()->json(['status' => 'Kategori berhasil diubah'], 200);          
         }
     }
 
@@ -83,19 +96,23 @@ class KategoriController extends Controller
      */
     public function destroy(string $id)
     {
+        // Mengambil data kategori berdasarkan ID
         $kategori = Kategori::find($id);
 
         if (!$kategori) {
+            // Mengembalikan response JSON dengan pesan error jika kategori tidak ditemukan
             return response()->json(['status' => 'Kategori tidak ditemukan'], 404);
         }
         
         try {
+            // Menghapus data kategori dari database
             $kategori->delete();
+            // Mengembalikan response JSON dengan pesan sukses jika kategori berhasil dihapus
             return response()->json(['status' => 'Kategori berhasil dihapus'], 200);
-        } catch (\Illuminate\Database\QueryException) {
-            // Tangkap pengecualian spesifik dari database (termasuk constraints foreign key)
+        } catch (\Illuminate\Database\QueryException $e) {
+            // Menangkap pengecualian spesifik dari database (termasuk constraints foreign key)
+            // Mengembalikan response JSON dengan pesan error jika terjadi kesalahan
             return response()->json(['status' => 'Kategori tidak dapat dihapus'], 500);
         }
-    
     }
 }
