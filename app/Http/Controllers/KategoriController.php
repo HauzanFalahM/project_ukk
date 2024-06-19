@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 
-
 class KategoriController extends Controller
 {
     /**
@@ -51,25 +50,15 @@ class KategoriController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'deskripsi'    => 'required',
-            'kategori'  => 'required',
-            // 'kelas'   => 'required|not_in:blank',
-            // 'rombel'  => 'required',
-        //     'foto'    => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048'
+            'deskripsi' => 'required|unique:kategori,deskripsi',
+            'kategori' => 'required|in:M,A,BHP,BTHP',
         ]);
 
-        // //upload image
-        // $foto = $request->file('foto');
-        // $foto->storeAs('public/foto', $foto->hashName());
-
-        //create post
         Kategori::create([
-            'deskripsi'     => $request->deskripsi,
-            'kategori'   => $request->kategori
-            // 'foto'     => $foto->hashName()
+            'deskripsi' => $request->deskripsi,
+            'kategori' => $request->kategori,
         ]);
 
-        //redirect to index
         return redirect()->route('kategori.index')->with(['success' => 'Data Berhasil Disimpan!']);
     }
 
@@ -78,9 +67,7 @@ class KategoriController extends Controller
      */
     public function show(string $id)
     {
-        $rsetkategori= kategori::find($id);
-
-        //return $Barang;A
+        $rsetkategori = Kategori::find($id);
 
         //return view
         return view('v_kategori.show', compact('rsetkategori'));
@@ -101,17 +88,16 @@ class KategoriController extends Controller
     public function update(Request $request, string $id)
     {
         $this->validate($request, [
-            'kategori'  => 'required',
-            'deskripsi'    => 'required'
+            'kategori' => 'required',
+            'deskripsi' => 'required'
         ]);
 
         $rsetkategori = Kategori::find($id);
 
-
         //update post without image
         $rsetkategori->update([
-            'kategori'   => $request->kategori,
-            'deskripsi'     => $request->deskripsi
+            'kategori' => $request->kategori,
+            'deskripsi' => $request->deskripsi
         ]);
 
         //redirect to index
@@ -123,8 +109,7 @@ class KategoriController extends Controller
      */
     public function destroy(string $id)
     {
-     
-        if (DB::table('barang')->where('kategori_id', $id)->exists()){
+        if (DB::table('barang')->where('kategori_id', $id)->exists()) {
             return redirect()->route('kategori.index')->with(['Gagal' => 'Data Gagal Dihapus!']);
         } else {
             $rsetKategori = Kategori::find($id);
